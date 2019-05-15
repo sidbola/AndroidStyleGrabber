@@ -52,56 +52,64 @@ func main() {
 
 		for scanner.Scan() {
 			var inputLine = strings.TrimSpace(scanner.Text())
-			if strings.HasPrefix(inputLine, "<style") || strings.HasPrefix(inputLine, "<item") {
-				if strings.Contains(inputLine, "name=\"") {
-					var parts = strings.Split(inputLine, "\"")
-					var foundName = false
-					var foundValue = false
+			var inOpeningTag = false
+			var inXmlElement = false
 
-					if strings.HasPrefix(inputLine, "<style") {
-						for _, part := range parts {
-							if foundName {
-								fmt.Println(part)
-								output.WriteString(part + "\n")
-								break
-							}
-							if strings.Contains(part, "name=") {
-								foundName = true
-							}
-						}
-					} else {
-						for _, part := range parts {
-							if foundValue {
-								var value = strings.Replace(part, ">", "", -1)
-								value = strings.Replace(value, "</item", "", -1)
-								fmt.Println("\t\t- " + value)
-								output.WriteString("\t\t- " + value + "\n")
-								foundValue = false
-								break
-							}
-							if foundName {
-								fmt.Print("\t" + strings.Replace(part, "android:", "", -1))
-								output.WriteString("\t" + strings.Replace(part, "android:", "", -1))
-								foundValue = true
-							}
-							if strings.Contains(part, "name=") {
-								foundName = true
-							}
-						}
-					}
-				}
+			if strings.HasPrefix
+		}
 
-			} else if strings.HasPrefix(inputLine, "<color") {
-				if strings.Contains(inputLine, "name=\"") {
-					var parts = strings.Split(inputLine, "\"")
+		// for scanner.Scan() {
+		// 	var inputLine = strings.TrimSpace(scanner.Text())
+		// 	if strings.HasPrefix(inputLine, "<style") || strings.HasPrefix(inputLine, "<item") {
+		// 		if strings.Contains(inputLine, "name=\"") {
+		// 			var parts = strings.Split(inputLine, "\"")
+		// 			var foundName = false
+		// 			var foundValue = false
 
-					var value = parts[2]
-					value = strings.Replace(value, ">", "", -1)
-					value = strings.Replace(value, "</color", "", -1)
+		// 			if strings.HasPrefix(inputLine, "<style") {
+		// 				for _, part := range parts {
+		// 					if foundName {
+		// 						fmt.Println(part)
+		// 						output.WriteString(part + "\n")
+		// 						break
+		// 					}
+		// 					if strings.Contains(part, "name=") {
+		// 						foundName = true
+		// 					}
+		// 				}
+		// 			} else {
+		// 				for _, part := range parts {
+		// 					if foundValue {
+		// 						var value = strings.Replace(part, ">", "", -1)
+		// 						value = strings.Replace(value, "</item", "", -1)
+		// 						fmt.Println("\t\t- " + value)
+		// 						output.WriteString("\t\t- " + value + "\n")
+		// 						foundValue = false
+		// 						break
+		// 					}
+		// 					if foundName {
+		// 						fmt.Print("\t" + strings.Replace(part, "android:", "", -1))
+		// 						output.WriteString("\t" + strings.Replace(part, "android:", "", -1))
+		// 						foundValue = true
+		// 					}
+		// 					if strings.Contains(part, "name=") {
+		// 						foundName = true
+		// 					}
+		// 				}
+		// 			}
+		// 		}
 
-					resColors = append(resColors, Color{parts[1], value})
-				}
-			}
+		// 	} else if strings.HasPrefix(inputLine, "<color") {
+		// 		if strings.Contains(inputLine, "name=\"") {
+		// 			var parts = strings.Split(inputLine, "\"")
+
+		// 			var value = parts[2]
+		// 			value = strings.Replace(value, ">", "", -1)
+		// 			value = strings.Replace(value, "</color", "", -1)
+
+		// 			resColors = append(resColors, Color{parts[1], value})
+		// 		}
+		// 	}
 		}
 	}
 
