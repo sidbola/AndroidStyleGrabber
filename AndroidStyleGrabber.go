@@ -16,8 +16,12 @@ func main() {
 	}
 	output.WriteString("STYLES\n\n")
 
+	pathReader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter the path to the project: ")
+	text, _ := pathReader.ReadString('\n')
+
 	// project path
-	var projectPath = "insert path here"
+	var projectPath = strings.TrimSpace(text)
 
 	var xmlFilePaths []string
 	var resColors []Color
@@ -107,6 +111,6 @@ func main() {
 		fmt.Println(color)
 		//output.WriteString(color)
 		//output.WriteString("\n")
-	} 
+	}
 
 }
