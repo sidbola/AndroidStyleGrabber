@@ -41,49 +41,11 @@ func main() {
 		log.Println(err)
 	}
 
-	// find all styles in xml and add them to objects
-	for _, xmlFile := range xmlFilePaths {
-		xmlFileText, err := os.Open(xmlFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		scanner := bufio.NewScanner(xmlFileText)
-
-		for scanner.Scan() {
-			var inputLine = strings.TrimSpace(scanner.Text())
-			//var inOpeningTag = false
-			//var inXmlElement = false
-
-			if strings.HasPrefix(inputLine, "<") && !strings.HasPrefix(inputLine, "</") {
-				var xmlElement = getXmlElement(inputLine)
-				if xmlElement == "style" {
-					nameValue, propertyFound := getInlineProperty(inputLine, "name")
-					if propertyFound {
-						fmt.Println(xmlElement + " " + nameValue)
-					}
-				}
-			}
-		}
+	styles, colors := extractElements(xmlFilePaths)
+	if styles == nil {
+		return
+	} else if colors == nil {
+		return
 	}
 
-}
-
-func getXmlElement(inputLine string) string {
-	var xmlElement = inputLine[1:]
-	var elementParts = strings.Split(xmlElement, " ")
-	xmlElement = elementParts[0]
-	return xmlElement
-}
-
-func getInlineProperty(inputLine string, propertyName string) (string, bool) {
-	if strings.Contains(inputLine, propertyName) {
-		var parts = strings.Split(inputLine, propertyName + "=\"")
-		var propertyValue = parts[1]
-		propertyValue = strings.Split(propertyValue, "\"")[0]
-
-		return propertyValue, true
-	} else {
-		return "", false
-	}
 }
