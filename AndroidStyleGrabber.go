@@ -24,7 +24,7 @@ func main() {
 	var projectPath = strings.TrimSpace(text)
 
 	var xmlFilePaths []string
-	var resColors []Color
+	//var resColors []Color
 
 	// find all xml files and add them to a slice
 	err := filepath.Walk(projectPath,
@@ -52,73 +52,38 @@ func main() {
 
 		for scanner.Scan() {
 			var inputLine = strings.TrimSpace(scanner.Text())
-			var inOpeningTag = false
-			var inXmlElement = false
+			//var inOpeningTag = false
+			//var inXmlElement = false
 
-			if strings.HasPrefix
-		}
-
-		// for scanner.Scan() {
-		// 	var inputLine = strings.TrimSpace(scanner.Text())
-		// 	if strings.HasPrefix(inputLine, "<style") || strings.HasPrefix(inputLine, "<item") {
-		// 		if strings.Contains(inputLine, "name=\"") {
-		// 			var parts = strings.Split(inputLine, "\"")
-		// 			var foundName = false
-		// 			var foundValue = false
-
-		// 			if strings.HasPrefix(inputLine, "<style") {
-		// 				for _, part := range parts {
-		// 					if foundName {
-		// 						fmt.Println(part)
-		// 						output.WriteString(part + "\n")
-		// 						break
-		// 					}
-		// 					if strings.Contains(part, "name=") {
-		// 						foundName = true
-		// 					}
-		// 				}
-		// 			} else {
-		// 				for _, part := range parts {
-		// 					if foundValue {
-		// 						var value = strings.Replace(part, ">", "", -1)
-		// 						value = strings.Replace(value, "</item", "", -1)
-		// 						fmt.Println("\t\t- " + value)
-		// 						output.WriteString("\t\t- " + value + "\n")
-		// 						foundValue = false
-		// 						break
-		// 					}
-		// 					if foundName {
-		// 						fmt.Print("\t" + strings.Replace(part, "android:", "", -1))
-		// 						output.WriteString("\t" + strings.Replace(part, "android:", "", -1))
-		// 						foundValue = true
-		// 					}
-		// 					if strings.Contains(part, "name=") {
-		// 						foundName = true
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-
-		// 	} else if strings.HasPrefix(inputLine, "<color") {
-		// 		if strings.Contains(inputLine, "name=\"") {
-		// 			var parts = strings.Split(inputLine, "\"")
-
-		// 			var value = parts[2]
-		// 			value = strings.Replace(value, ">", "", -1)
-		// 			value = strings.Replace(value, "</color", "", -1)
-
-		// 			resColors = append(resColors, Color{parts[1], value})
-		// 		}
-		// 	}
+			if strings.HasPrefix(inputLine, "<") && !strings.HasPrefix(inputLine, "</") {
+				var xmlElement = getXmlElement(inputLine)
+				if xmlElement == "style" {
+					nameValue, propertyFound := getInlineProperty(inputLine, "name")
+					if propertyFound {
+						fmt.Println(xmlElement + " " + nameValue)
+					}
+				}
+			}
 		}
 	}
 
-	output.WriteString("COLORS\n\n")
+}
 
-	for _, color := range resColors {
-		fmt.Println(color)
-		//output.WriteString(color)
-		//output.WriteString("\n")
+func getXmlElement(inputLine string) string {
+	var xmlElement = inputLine[1:]
+	var elementParts = strings.Split(xmlElement, " ")
+	xmlElement = elementParts[0]
+	return xmlElement
+}
+
+func getInlineProperty(inputLine string, propertyName string) (string, bool) {
+	if strings.Contains(inputLine, propertyName) {
+		var parts = strings.Split(inputLine, propertyName + "=\"")
+		var propertyValue = parts[1]
+		propertyValue = strings.Split(propertyValue, "\"")[0]
+
+		return propertyValue, true
+	} else {
+		return "", false
 	}
-
 }
