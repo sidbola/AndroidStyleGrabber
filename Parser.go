@@ -42,31 +42,37 @@ func extractElements(xmlFilePaths []string) (styles []Style, colors []Color) {
 
 		scanner := bufio.NewScanner(xmlFileText)
 
-		var inXmlElement = false
-
 		for scanner.Scan() {
 			var inputLine = strings.TrimSpace(scanner.Text())
-
-			if inXmlElement {
-
-			}
-
+			var xmlElement = getXMLElement(inputLine)
+			var styles []Style
+			var colors []Color
+			
 			if strings.HasPrefix(inputLine, "<") && !strings.HasPrefix(inputLine, "</") {
 
-				var xmlElement = getXMLElement(inputLine)
+				// if !strings.HasSuffix(inputLine, "</"+xmlElement+">") && !strings.HasSuffix(inputLine, "/>") {
+				// 	inXmlElement = true
+				// }
 
-				if !strings.HasSuffix(inputLine, "</"+xmlElement+">") && !strings.HasSuffix(inputLine, "/>") {
-					inXmlElement = true
+				if xmlElement == "item" {
+					itemNameValue, itemNameFound := getInlineProperty(inputLine, "name")
+					itemValue := getInlineValue(inputLine)
+					tempItem := Item{itemNameValue, itemValue}
+
+					if itemNameFound {
+						styles[len(styles) - 1].Items = append(styles[len(styles) - 1].Items, tempItem)
+					}
 				}
 
 				if xmlElement == "style" {
-					fmt.Println(inputLine)
-					nameValue, nameFound := getInlineProperty(inputLine, "name")
+					styleNameValue, styleNameFound := getInlineProperty(inputLine, "name")
 					parentValue, parentFound := getInlineProperty(inputLine, "parent")
-					if nameFound && parentFound {
-						fmt.Println(xmlElement + "\t| name: " + nameValue + "\t| parent: " + parentValue)
-					} else if nameFound {
-						fmt.Println(xmlElement + "\t| name: " + nameValue)
+					if styleNameFound && parentFound {
+						styles = append(styles, Style{styleNameValue, parentValue, []Item{}})
+						//fmt.Println(xmlElement + "\t| name: " + styleNameValue + "\t| parent: " + parentValue)
+					} else if styleNameFound {
+						
+						fmt.Println(xmlElement + "\t| name: " + styleNameValue)
 					}
 				}
 				if xmlElement == "color" {
