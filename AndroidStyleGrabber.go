@@ -42,10 +42,7 @@ func main() {
 	}
 
 	styles, colors := extractElements(xmlFilePaths)
-	if styles == nil {
-		return
-	} else if colors == nil {
-		return
-	}
+	fmt.Println(styles)
+	fmt.Println(colors)
 
 }

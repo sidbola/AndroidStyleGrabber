@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -27,12 +26,17 @@ func getInlineProperty(inputLine string, propertyName string) (string, bool) {
 
 func getInlineValue(inputLine string) string {
 	var parts = strings.Split(inputLine, ">")
-	var color = parts[1]
-	color = strings.Split(color, "<")[0]
-	return color
+	if len(parts) > 1 {
+		var color = parts[1]
+		color = strings.Split(color, "<")[0]
+		return color
+	}
+	return ""
 }
 
-func extractElements(xmlFilePaths []string) (styles []Style, colors []Color) {
+func extractElements(xmlFilePaths []string) ([]Style, []Color) {
+	var styles []Style
+	var colors []Color
 	// find all styles in xml and add them to objects
 	for _, xmlFile := range xmlFilePaths {
 		xmlFileText, err := os.Open(xmlFile)
@@ -44,23 +48,21 @@ func extractElements(xmlFilePaths []string) (styles []Style, colors []Color) {
 
 		for scanner.Scan() {
 			var inputLine = strings.TrimSpace(scanner.Text())
-			var xmlElement = getXMLElement(inputLine)
-			var styles []Style
-			var colors []Color
-			
-			if strings.HasPrefix(inputLine, "<") && !strings.HasPrefix(inputLine, "</") {
+
+			if strings.HasPrefix(inputLine, "<") && !strings.HasPrefix(inputLine, "</") && !strings.HasPrefix(inputLine, "<!--") {
+				var xmlElement = getXMLElement(inputLine)
 
 				// if !strings.HasSuffix(inputLine, "</"+xmlElement+">") && !strings.HasSuffix(inputLine, "/>") {
 				// 	inXmlElement = true
 				// }
 
-				if xmlElement == "item" {
+				if xmlElement == "item" && len(styles) > 0 {
 					itemNameValue, itemNameFound := getInlineProperty(inputLine, "name")
 					itemValue := getInlineValue(inputLine)
 					tempItem := Item{itemNameValue, itemValue}
 
 					if itemNameFound {
-						styles[len(styles) - 1].Items = append(styles[len(styles) - 1].Items, tempItem)
+						styles[len(styles)-1].Items = append(styles[len(styles)-1].Items, tempItem)
 					}
 				}
 
@@ -71,20 +73,21 @@ func extractElements(xmlFilePaths []string) (styles []Style, colors []Color) {
 						styles = append(styles, Style{styleNameValue, parentValue, []Item{}})
 						//fmt.Println(xmlElement + "\t| name: " + styleNameValue + "\t| parent: " + parentValue)
 					} else if styleNameFound {
-						
-						fmt.Println(xmlElement + "\t| name: " + styleNameValue)
+						styles = append(styles, Style{styleNameValue, "", []Item{}})
+						//fmt.Println(xmlElement + "\t| name: " + styleNameValue)
 					}
 				}
 				if xmlElement == "color" {
 					colorNameValue, colorNameFound := getInlineProperty(inputLine, "name")
 					if colorNameFound {
 						var colorValue = getInlineValue(inputLine)
-						fmt.Println(xmlElement + "\t| name: " + colorNameValue + "\t| color: " + colorValue)
+						colors = append(colors, Color{colorNameValue, colorValue})
+						//fmt.Println(xmlElement + "\t| name: " + colorNameValue + "\t| color: " + colorValue)
 					}
 				}
 			}
 		}
 	}
 
-	return nil, nil
+	return styles, colors
 }
